@@ -1,0 +1,16 @@
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+
+# Kubernetes secrets
+secrets/
+kubeconfig*
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+crash.log
