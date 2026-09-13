@@ -10,7 +10,7 @@ Apple Silicon MacBook Air에서 Colima와 kind를 사용해 로컬 Kubernetes
 
 ## 클러스터 구성
 
-- Kubernetes: v097/v1.37.0/
+- Kubernetes: v097/v1.37.0
 - control-plane: 1개
 - worker: 1개
 - 애플리케이션 Pod: 2개
