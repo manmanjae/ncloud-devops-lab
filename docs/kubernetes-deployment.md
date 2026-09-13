@@ -10,7 +10,7 @@ Apple Silicon MacBook Air에서 Colima와 kind를 사용해 로컬 Kubernetes
 
 ## 클러스터 구성
 
-- Kubernetes: v097
+- Kubernetes: v097/v1.37.0/
 - control-plane: 1개
 - worker: 1개
 - 애플리케이션 Pod: 2개
@@ -70,3 +70,56 @@ RollingUpdate 전략에는 다음 정책을 적용했습니다.
 
 ```text
 uid=10001(app) gid=10001(app) groups=10001(app)
+
+```
+
+## Service 구성
+
+애플리케이션 Pod 앞에 `ClusterIP` Service를 구성했습니다.
+
+- Service port: `80`
+- Container target port: `8000`
+- selector: `app.kubernetes.io/name=devops-lab-api`
+
+ClusterIP는 클러스터 내부에서만 접근할 수 있으므로 로컬 검증에는
+`kubectl port-forward`를 사용했습니다.
+
+```bash
+kubectl port-forward \
+  -n devops-lab \
+  service/devops-lab-api \
+  8000:80
+```
+
+## 배포 검증 결과
+
+```text
+Deployment Ready: 2/2
+Available Pods: 2
+Pod Restart Count: 0
+Ready: True
+ContainersReady: True
+PodScheduled: True
+SeccompProfile: RuntimeDefault
+```
+
+두 Pod 모두 worker 노드에서 실행됐으며 startup, readiness, liveness Probe를
+통과했습니다.
+
+## 현재 구성의 제약 사항
+
+현재 클러스터에는 worker 노드가 하나만 있으므로 Pod가 2개여도 두 Pod가
+동일한 worker 노드에 배치됩니다. 따라서 Pod 장애에는 대응할 수 있지만
+worker 노드 자체의 장애를 견디는 고가용성 구성은 아닙니다.
+
+향후 멀티 worker 클러스터와 Pod Anti-Affinity 또는 Topology Spread
+Constraints를 적용하여 노드 단위 장애 대응을 실습할 예정입니다.
+
+## 향후 개선 계획
+
+- Ingress Controller를 통한 외부 접근
+- ConfigMap을 이용한 환경설정 분리
+- PodDisruptionBudget 적용
+- Helm Chart 작성
+- Prometheus 및 Grafana 모니터링
+- NAVER Cloud NKS 환경으로 이전
