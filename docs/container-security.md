@@ -32,3 +32,68 @@ FastAPI 애플리케이션을 컨테이너로 실행하고, 최소 권한 원칙
 
 ```bash
 docker exec devops-lab-api id
+
+```
+
+결과:
+
+```text
+uid=10001(app) gid=10001(app) groups=10001(app)
+```
+
+### 2. 애플리케이션 디렉터리 쓰기 차단 확인
+
+컨테이너의 `/app` 디렉터리에 파일 생성을 시도했습니다.
+
+```bash
+docker exec devops-lab-api sh -c 'touch /app/write-test'
+```
+
+예상대로 읽기 전용 파일시스템 오류가 발생했습니다.
+
+```text
+touch: cannot touch '/app/write-test': Read-only file system
+```
+
+이를 통해 애플리케이션 프로세스가 침해되더라도 실행 코드나 설정 파일을
+임의로 변경하기 어렵도록 제한된 것을 확인했습니다.
+
+### 3. 임시 디렉터리 쓰기 확인
+
+애플리케이션이 임시 파일을 생성할 수 있도록 `/tmp`만 tmpfs로 제공했습니다.
+
+```bash
+docker exec devops-lab-api sh -c \
+  'touch /tmp/write-test && ls -l /tmp/write-test'
+```
+
+결과:
+
+```text
+-rw-r--r-- 1 app app 0 /tmp/write-test
+```
+
+애플리케이션 영역은 보호하면서 필요한 임시 쓰기 작업은 허용됨을 확인했습니다.
+
+### 4. 컨테이너 설정 확인
+
+```bash
+docker inspect \
+  --format 'User={{.Config.User}} ReadOnly={{.HostConfig.ReadonlyRootfs}} CapDrop={{json .HostConfig.CapDrop}} SecurityOpt={{json .HostConfig.SecurityOpt}}' \
+  devops-lab-api
+```
+
+결과:
+
+```text
+User=10001:10001 ReadOnly=true CapDrop=["ALL"] SecurityOpt=["no-new-privileges:true"]
+```
+
+## 결론
+
+컨테이너를 root 권한 없이 실행하고 애플리케이션 파일시스템을 읽기 전용으로
+제한했습니다. 모든 Linux Capability를 제거하고 추가 권한 상승을 차단했으며,
+임시 쓰기 작업은 메모리 기반 `/tmp` 영역에서만 허용했습니다.
+
+향후 동일한 정책을 Kubernetes의 `securityContext`,
+`readOnlyRootFilesystem`, `capabilities`, `emptyDir` 설정으로 이전할 예정입니다.
