@@ -14,3 +14,9 @@ kubeconfig*
 *.tfstate.*
 *.tfvars
 crash.log
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
