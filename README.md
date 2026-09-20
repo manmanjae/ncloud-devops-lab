@@ -23,6 +23,7 @@ Apple Silicon MacBook Air에서 구축한 로컬 Kubernetes 운영 실습 프로
 - [x] 자체 API를 Kubernetes Deployment로 배포
 - [x] Startup·Readiness·Liveness Probe 구성
 - [x] Kubernetes SecurityContext 및 리소스 제한 적용
+- [x] ConfigMap을 이용한 애플리케이션 환경설정 분리
 - [ ] Ingress 구성
 - [ ] Helm 패키징
 - [ ] 모니터링 및 로깅

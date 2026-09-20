@@ -27,3 +27,26 @@ def test_version():
     assert "version" in body
     assert "hostname" in body
     assert "uptime_seconds" in body
+
+def test_root_uses_default_message(monkeypatch):
+    monkeypatch.delenv("APP_MESSAGE", raising=False)
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "service": "devops-lab-api",
+        "message": "Hello from Kubernetes",
+    }
+
+
+def test_root_uses_environment_message(monkeypatch):
+    monkeypatch.setenv("APP_MESSAGE", "Hello from ConfigMap test")
+
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "service": "devops-lab-api",
+        "message": "Hello from ConfigMap test",
+    }

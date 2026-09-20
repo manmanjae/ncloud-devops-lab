@@ -16,7 +16,7 @@ started_at = time.time()
 def root():
     return {
         "service": "devops-lab-api",
-        "message": "Hello from Kubernetes",
+        "message": os.getenv("APP_MESSAGE", "Hello from Kubernetes"),
     }
 
 
