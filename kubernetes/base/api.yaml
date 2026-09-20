@@ -36,14 +36,14 @@ spec:
           type: RuntimeDefault
       containers:
         - name: api
-          image: devops-lab-api:0.1.0
+          image: devops-lab-api:0.2.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
               containerPort: 8000
-          env:
-            - name: APP_VERSION
-              value: "0.1.0"
+          envFrom:
+            - configMapRef:
+                name: devops-lab-api-config
           resources:
             requests:
               cpu: 50m
